@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+    <!-- <link rel="stylesheet" src="../public/stylesheets/style.css"> -->
+    <style>
+        body {
+            padding: 20px 100px 100px 100px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        li div a {
+            margin-left: 15px;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>Projekti</h1>
+
+    <ul>
+        <% projects.forEach(member => { %>
+          <li>
+            <h3><%= member.naziv_projekta %></h3>
+            <div>
+                <a href="/projects/details/<%= member._id %>">details</a>
+                <a href="/projects/edit/<%= member._id %>">edit</a>
+                <a href="/projects/newmember/<%= member._id %>">add memeber</a>
+                <a href="#" onclick="deleteResource(event, 'http://127.0.0.1:3000/projects/<%= member._id %>')">delete</a>
+            </div>
+        </li>
+        <hr>
+        <% }); %>
+    </ul>
+      
+    <script>
+        function deleteResource(event, url) {
+            event.preventDefault(); // prevent the default link behavior
+        
+            fetch(url, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Resource deleted successfully');
+                } else {
+                    console.error('Failed to delete resource');
+                }
+            })
+            .catch(error => {
+                console.error('Error occurred while deleting resource', error);
+            });
+        }
+    </script>
+</body>
+</html>

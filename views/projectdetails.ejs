@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details</title>
+    <!-- <link rel="stylesheet" src="../public/stylesheets/style.css"> -->
+    <style>
+        body {
+            padding: 20px 100px 100px 100px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .table {
+            width: 100%;
+        }
+
+        .row {
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .row p {
+            width: 70%;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>Projekti</h1>
+
+    <div class="table">
+        <div class="row">
+            <h3>Naziv projekta</h3>
+            <p><%= result.naziv_projekta %></p>
+        </div>
+    
+        <div class="row">
+            <h3>Opis projekta</h3>
+            <p><%= result.opis_projekta %></p>
+        </div>
+    
+        <div class="row">
+            <h3>Cijena projekta</h3>
+            <p><%= result.cijena_projekta %></p>
+        </div>
+    
+        <div class="row">
+            <h3>Datum početka</h3>
+            <p><%= result.datum_pocetka %></p>
+        </div>
+    
+        <div class="row">
+            <h3>Datum završetka</h3>
+            <p><%= result.datum_zavrsetka %></p>
+        </div>
+    
+        <div class="row">
+            <h3>Članovi</h3>
+            <div>
+                <% result.members.forEach(member => { %>
+                    <p style="width: fit-content"><%= member.name %></p>
+                    <br>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+      
+
+</body>
+</html>
