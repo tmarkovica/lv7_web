@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGNUP</title>
+    <style>
+        body {
+            padding: 20px 100px 100px 100px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;    
+        }
+
+        label {
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 300px;
+        }
+
+        button {
+            margin-top: 30px;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SIGNUP</h1>
+
+    <form method="POST" action="/users/register">
+
+        <label for="name">Name</label>
+        <input type="name" name="name" id="name">
+
+        <label for="email">E - Mail</label>
+        <input type="email" name="email" id="email">
+
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password">
+
+        <button type="submit">Signup</button>
+
+    </form>
+
+</body>
+</html>

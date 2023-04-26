@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const UserModel = require('../model/user')
+const user = require('../model/user')
 
 router.get('/:id', async (req, res) => {
     try {
@@ -12,22 +13,57 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-router.get('/register', (req, res) => {
-    var name = req.body.naziv_projekta;
-    var email = req.body.opis_projekta;
-    var age = req.body.cijena_projekta;
-
-    const user = new UserModel({
-        name: name,
-        email: email,
-        age: age
+router.post('/login', async (req, res) => {
+    const login = new UserModel({
+        name: req.body.name,
+        password: req.body.password
     })
 
-    user.save()
-        .then(() => console.log('User saved to database...'))
-        .catch(err => console.error('Error saving user...', err));
+    if (login.name == '' || login.password == '')
+        return
 
-    res.redirect('/')
+    try {
+        const userInDb = await UserModel.findOne({email: newUser.email})
+
+        if (userInDb) {
+            
+            if (login.password === userInDb.password) {
+                res.render('/')
+            }
+        }
+        else {
+            res.send('Netočni podaci za prijavu')
+        }
+    } catch (err) {
+        res.redirect('/')
+    } 
+})
+
+router.post('/register', async (req, res) => {
+    const newUser = new UserModel({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password
+    })
+
+    if (newUser.name == '' || newUser.password == '' || newUser.email == '')
+        return
+
+    try {
+        const userInDb = await UserModel.findOne({email: newUser.email})
+
+        if (userInDb == null) { // ako user već ne postoji onda je tek moguće kreirati novog
+            
+            newUser.save()
+                .then(() => console.log('User saved to database...'))
+                .catch(err => console.error('Error saving user...', err));
+        }
+        else {
+            res.send('E-Mail je zauzet')
+        }
+    } catch (err) {
+        res.redirect('/')
+    }   
 })
 
 
