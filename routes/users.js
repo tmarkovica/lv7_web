@@ -1,9 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const UserModel = require('../model/user')
-const user = require('../model/user')
+const jwt = require('jsonwebtoken')
+const authMiddleware = require('../middleware/authMiddleware')
 
-router.get('/:id', async (req, res) => {
+router.get('/one/:id', async (req, res) => {
     try {
         const id = req.params.id
          const result = await UserModel.findById(id)
@@ -15,7 +16,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     const login = new UserModel({
-        name: req.body.name,
+        email: req.body.email,
         password: req.body.password
     })
 
@@ -23,18 +24,26 @@ router.post('/login', async (req, res) => {
         return
 
     try {
-        const userInDb = await UserModel.findOne({email: newUser.email})
+        const userInDb = await UserModel.findOne({email: login.email})
 
         if (userInDb) {
+
+            console.log("user found in db")
             
-            if (login.password === userInDb.password) {
-                res.render('/')
+            if (login.password === userInDb.password) {   
+                console.log("password matches")
+                const token = jwt.sign(userInDb.toJSON(), 'mysecret')
+                res.cookie("jwt", token)
+                res.redirect('/')
+            } else {
+                res.send('Netočni podaci za prijavu')    
             }
         }
         else {
             res.send('Netočni podaci za prijavu')
         }
     } catch (err) {
+        console.log(err.message)
         res.redirect('/')
     } 
 })
@@ -65,6 +74,5 @@ router.post('/register', async (req, res) => {
         res.redirect('/')
     }   
 })
-
 
 module.exports = router
