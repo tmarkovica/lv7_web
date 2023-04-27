@@ -64,8 +64,14 @@
     
         <div class="row">
             <h3>Članovi</h3>
-            <div>
+            <!-- <div>
                 <% result.members.forEach(member => { %>
+                    <p style="width: fit-content"><%= member %></p>
+                    <br>
+                <% }); %>
+            </div> -->
+            <div>
+                <% projectMembers.forEach(member => { %>
                     <p style="width: fit-content"><%= member.name %></p>
                     <br>
                 <% }); %>

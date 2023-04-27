@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+    <!-- <link rel="stylesheet" src="../public/stylesheets/style.css"> -->
+    <style>
+        body {
+            padding: 20px 100px 100px 100px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        li div a {
+            margin-left: 15px;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>Projekti</h1>
+
+    <ul>
+        <% projects.forEach(member => { %>
+          <li>
+            <h3><%= member.naziv_projekta %></h3>
+        </li>
+        <hr>
+        <% }); %>
+    </ul>
+</body>
+</html>

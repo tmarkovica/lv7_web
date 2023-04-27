@@ -1,8 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const ProjectModel = require('../model/project')
-const cookieParser = require('cookie-parser');
-const app = express()
+const UserModel = require('../model/user')
 
 // Read
 router.get('/', async (req, res) => {
@@ -37,10 +36,15 @@ router.post('/', (req, res) => {
         datum_pocetka: datum_pocetka,
         datum_zavrsetka: datum_zavrsetka
     })
+    const userId = req.cookies.user._id
 
     project.save()
-        .then(() => console.log('Document saved to database...'))
+        .then(() => console.log('New Project saved to database...'))
         .catch(err => console.error('Error saving document...', err));
+
+    UserModel.findByIdAndUpdate(userId, { $push: { createdProjects: project._id } }, { new: true })
+        .then(() => console.log('ProjectId saved to database under user.createdProjects...'))
+        .catch(err => console.error('Error saving document...', err));    
 
     res.redirect('/')
 })
@@ -87,35 +91,59 @@ router.delete('/:id', async (req, res) => {
 })
 
 router.get('/newmember/:projectId', async (req, res) => {
-    const projectId = req.params.projectId
+    try {
+        const projectId = req.params.projectId
+        const project = await ProjectModel.findById(projectId)
 
-    res.render('newmember', {projectId})
+        let users = await UserModel.find()
+    
+
+        res.render('newmember', {
+            projectId: projectId, 
+            users: users,
+            project: project
+        })
+    } catch (error) {
+        console.error(error);
+        res.redirect('/')
+    }    
 })
 
 // add member
-router.post('/newmember/:projectId', async (req, res) => {
+router.post('/newmember/:projectId', async (req, res) => { 
     const projectId = req.params.projectId
-    var member = req.body.name
+    const usersArray = Object.values(req.body)
+    
+    ProjectModel.findByIdAndUpdate(projectId, { $addToSet: { members: { $each: usersArray } } }, { new: true })
 
-    ProjectModel.findByIdAndUpdate(projectId, { $push: { members: { name: member } } }, { new: true })
     .then(updatedProject => {
-        console.log(updatedProject);
         res.redirect(`/projects/details/${projectId}`);
     })
     .catch(err => {
         console.error(err);
-        res.redirect('/')
+        res.redirect('/') 
     });
-
 })
 
 router.get('/details/:id', async (req, res) => {
     try {
         const id = req.params.id
          const result = await ProjectModel.findById(id)
-         //res.status(200).send(result)    
-         console.log(result)
-         res.render('projectdetails', {result})
+
+        const projectMembers = [];
+        const promises = result.members.map(async (memberId) => {
+        const user = await UserModel.findById(memberId);
+        if (user) {
+            projectMembers.push(user);
+        }
+        });
+
+        await Promise.all(promises);
+         
+        res.render('projectdetails', {
+            result: result, 
+            projectMembers: projectMembers 
+        })
     } catch (err) {
          res.status(500).json({error: err.message})
     }
@@ -124,11 +152,66 @@ router.get('/details/:id', async (req, res) => {
 router.get('/edit/:id', async (req, res) => {
     try {
         const id = req.params.id
-         const result = await ProjectModel.findById(id)
-         res.render('editproject', {result})
+        const result = await ProjectModel.findById(id)
+
+        const userInDb = await UserModel.findById(req.cookies.user._id)
+
+        if (userInDb.createdProjects.includes(id)) // ako je user kreirao projekt moze uredivati sve
+            res.render('editproject', {result})
+        else // inace ureduje samo obavljeni_poslovi
+            res.render('membereditproject', {result})
     } catch (err) {
-         res.status(500).json({error: err.message})
-         res.redirect('/projects')
+        res.status(500).json({error: err.message})
+        res.redirect('/')
+    }
+})
+
+router.delete('/memberunchecked/:projectId/members/:userId', async (req, res) => {
+    const projectId = req.params.projectId
+    const userId = req.params.userId
+
+    if (userId.includes('<')) {
+        return
+    }        
+    
+    ProjectModel.findByIdAndUpdate(projectId, { $pull: { members: userId } }, { new: true })
+        .then(() => {
+            res.redirect(`/details/${projectId}`);
+        })
+        .catch(err => {
+            console.error(err);
+            res.redirect('/') 
+        });
+})
+
+router.get('/onlymyprojects', async (req, res) => {
+    try {        
+        const userInDb = await UserModel.findById(req.cookies.user._id)
+
+        const projects = []
+        for (let i = 0; i < userInDb.createdProjects?.length; i++) {
+            const project = await ProjectModel.findById(userInDb.createdProjects[i])
+            if (project) {
+                projects.push(project)
+            }
+        }
+        res.render('onlymyprojects', {projects})
+    } catch (err) {
+        console.log(err.message)
+        res.redirect('/')
+    }
+})
+
+router.get('/memberonprojects', async (req, res) => {
+    try {
+        const loggedUserId = req.cookies.user._id
+
+        const projects = await ProjectModel.find({ members: loggedUserId })
+        res.render('memberonprojects', {projects})
+
+    } catch (err) {
+        console.log(err.message)
+        res.redirect('/')
     }
 })
 

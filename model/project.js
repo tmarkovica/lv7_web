@@ -8,9 +8,7 @@ const exampleSchema = new mongoose.Schema({
     obavljeni_poslovi: String,
     datum_pocetka: Date,
     datum_zavrsetka: Date,
-    members: [{
-        name: String
-    }]
+    members: [String]
 });
 
 // Create a model

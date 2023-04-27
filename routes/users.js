@@ -30,8 +30,9 @@ router.post('/login', async (req, res) => {
 
             console.log("user found in db")
             
-            if (login.password === userInDb.password) {   
+            if (login.password === userInDb.password) {
                 console.log("password matches")
+                res.cookie("user", userInDb)
                 const token = jwt.sign(userInDb.toJSON(), 'mysecret')
                 res.cookie("jwt", token)
                 res.redirect('/')
@@ -66,6 +67,8 @@ router.post('/register', async (req, res) => {
             newUser.save()
                 .then(() => console.log('User saved to database...'))
                 .catch(err => console.error('Error saving user...', err));
+
+            res.redirect('/')
         }
         else {
             res.send('E-Mail je zauzet')

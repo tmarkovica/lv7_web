@@ -14,39 +14,42 @@
         h1 {
             text-align: center;
         }
-
-        form {
-            display: flex;
-            flex-direction: column;    
-        }
-
-        label {
-            margin-top: 20px;
-            margin-bottom: 5px;
-        }
-
-        input {
-            width: 300px;
-        }
-
-        button {
-            margin-top: 30px;
-            width: 100px;
-        }
     </style>
 </head>
 <body>
     
-    <h1>Forma za dodavanje projekta</h1>
+    <h1>Projekt: <%= project.naziv_projekta %></h1>
+
+    <h3>Korisnici koji su na projektu</h3>
 
     <form method="POST" action="/projects/newmember/<%= projectId %>">
-
-        <label for="name">Ime člana</label>
-        <input type="text" name="name" id="name">
-
-        <button type="submit">Pohrani</button>
-
+        <% users.forEach((user, index) => { %>
+          <input type="checkbox"
+                 name="usersArray[<%= index %>]"
+                 value="<%= user._id %>"
+                 id="option<%= index %>"
+                 onclick="makePostRequest(event)"
+                 <% if (project.members.includes(user._id)) { %>checked<% } %>
+          >
+          <label for="option<%= index %>"><%= user.name %></label><br>
+        <% }); %>
+        <button type="submit">Submit</button>
     </form>
 
+    <script>
+        function makePostRequest(event) {
+            var userId = event.target.value;
+            var projectId = "<%= project._id %>";
+            
+            if (!event.target.checked) {
+                fetch(`/projects/memberunchecked/${projectId}/members/${userId}`, {
+                    method: "DELETE"
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error(error));
+            }
+        }
+    </script>
 </body>
 </html>

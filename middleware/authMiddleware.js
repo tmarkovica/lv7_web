@@ -1,23 +1,27 @@
 const jwt = require('jsonwebtoken')
-const express = require('express');
-const app = express();
-const cookieParser = require("cookie-parser");
+const UserModel = require('../model/user')
 
-app.use(cookieParser());
+/* const express = require('express');
+const cookieParser = require("cookie-parser");
+const app = express();
+app.use(cookieParser()); */
 
 const requireAuth = (req, res, next) => {
 
     try {
         const token = req.cookies.jwt
-        console.log(token)
 
         if (token) {
-            jwt.verify(token, 'mysecret', (err, decodedToken) => {
+            jwt.verify(token, 'mysecret', async (err, decodedToken) => {
                 if (err) {
                     res.redirect('/login')
                 } else {
-                    console.log(decodedToken)
-                    next()
+                    const userInDb = await UserModel.findOne({_id: decodedToken._id})
+                    if (userInDb) {
+                        next()
+                    }                        
+                    else
+                        res.redirect('/login')
                 }
             })
         }
